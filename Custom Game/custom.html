@@ -1,0 +1,102 @@
+<html>
+<head>
+<title> Custom Game </title>
+<script src="https://simplycodingcourses.com/files/simply.js"></script>
+<script>
+function start(){
+sjs.open("target",600,355);
+
+var background = new sjs.Image("Images/background.jpg");
+background.setSize(sjs.getWidth(), sjs.getHeight());
+
+var player = new sjs.Image("Images/car1.png.png");
+player.type = "player";
+player.setSize(100,100);
+player.setGravity(10);
+player.bottom();
+
+
+//Jumping Code
+var canJump = true;
+sjs.keyDown(SPACE_KEY, function(){
+	if(canJump == true){
+	canJump = true;
+player.pushUp(10);
+if(r_facing == true){
+	player.setImage("Images/car.png.png");
+	r_track = 8;
+} else {
+	player.setImage("Images/car.png.png");
+	l_track = 8;
+}
+}
+});
+
+
+//Enemies
+setInterval(function(){
+	var speed = Math.round(1 + Math.random()*10);
+	
+		var enemy = new sjs.Image("Images/cone.png.png");
+		enemy.type = "enemy";
+		enemy.setSize(100,50);
+		enemy.noBounds = true;
+		enemy.friction = 0;
+		enemy.pushLeft(speed);
+		enemy.scaleSize(.5 + Math.random() * 1.2);
+		enemy.moveTo(sjs.getWidth(), Math.random()*(enemy.getClamp().y));
+	
+},2000);
+
+sjs.left_screen.offset(-500);
+sjs.right_screen.offset(500);
+
+sjs.onHit("enemy",["right_screen","left_screen"], function(x,y){
+	x.destroy();
+
+});
+
+//onhit functions
+
+sjs.onHit("player","bottom_screen",function(x,y){
+	sjs.stoppedBy(x,y);
+if(canJump == false){
+	canJump = true;
+	r_track = 0;
+	l_track = 0;
+	}
+
+
+});
+
+//Score
+
+	var score = 0;
+	var score_txt = new sjs.Text("Score: 0", 21, "orange");
+
+sjs.onHit("enemy","left_screen" , function(x,y){
+	x.destroy();
+		score = score + 1;
+		score_txt.setText("Score: "+score);
+		localStorage.setItem("score", score);
+		if(score >= 10){
+		window.location = "win.html";
+		}
+
+		});
+
+sjs.onHit("player", "enemy" , function(x,y){
+	x.destroy();
+	window.location = "gameover.html";
+	y.destroy();
+});
+
+} //end start
+</script>
+</head>
+<body onload="start()">
+<h1> Custom Game </h1>
+
+<div id="target" style="margin:auto;background:grey;"></div>
+</body>
+</html>
